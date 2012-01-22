@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 
 use Module::Build;
+use utf8;
 
 my $build = Module::Build->new(
     module_name         => 'Games::Lacuna::Task',
@@ -40,6 +41,7 @@ my $build = Module::Build->new(
         'Digest::MD5'                   => 0,
         'Unicode::Normalize'            => 0,
         'Try::Tiny'                     => 0,
+        'Term::ReadKey'                 => 0,
 
         'Email::Stuff'                  => 0,
         'Text::Table'                   => 0,

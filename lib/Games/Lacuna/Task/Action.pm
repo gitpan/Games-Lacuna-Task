@@ -29,7 +29,7 @@ sub execute {
     my $command_name = class_to_name($self);
     
     try {
-        local $SIG{TERM} = sub {
+        local $SIG{INT} = sub {
             $self->abort('Aborted by user');
         };
         local $SIG{__WARN__} = sub {
@@ -43,8 +43,13 @@ sub execute {
         $self->log('error',"An error occured while processing action %s: %s",$command_name,$_);
     };
     
-};
+}
 
+sub run {
+    my ($self) = @_;
+    
+    $self->abort('Abstract method <run> called in %s',__PACKAGE__)
+}
 
 __PACKAGE__->meta->make_immutable;
 no Moose;

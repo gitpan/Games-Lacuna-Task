@@ -1,7 +1,7 @@
 {
    "abstract" : "Automation framework for the Lacuna Expanse MMPOG",
    "author" : [
-      "MaroÅ¡ KollÃ¡r <maros@cpan.org>"
+      "Maroš Kollár <maros@cpan.org>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112621",
@@ -41,6 +41,7 @@
             "MooseX::Types::Path::Class" : 0,
             "Path::Class" : 0,
             "Term::ANSIColor" : 0,
+            "Term::ReadKey" : 0,
             "Text::CSV" : 0,
             "Text::Table" : 0,
             "Try::Tiny" : 0,
@@ -53,7 +54,7 @@
    "provides" : {
       "Games::Lacuna::Task" : {
          "file" : "lib/Games/Lacuna/Task.pm",
-         "version" : "2.00"
+         "version" : "2.01"
       },
       "Games::Lacuna::Task::Action" : {
          "file" : "lib/Games/Lacuna/Task/Action.pm",
@@ -85,6 +86,10 @@
       },
       "Games::Lacuna::Task::Action::Defence" : {
          "file" : "lib/Games/Lacuna/Task/Action/Defence.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::EmpireFind" : {
+         "file" : "lib/Games/Lacuna/Task/Action/EmpireFind.pm",
          "version" : 0
       },
       "Games::Lacuna::Task::Action::EmpireReport" : {
@@ -135,8 +140,12 @@
          "file" : "lib/Games/Lacuna/Task/Action/Spy.pm",
          "version" : 0
       },
-      "Games::Lacuna::Task::Action::StarCache" : {
-         "file" : "lib/Games/Lacuna/Task/Action/StarCache.pm",
+      "Games::Lacuna::Task::Action::StarCacheBuild" : {
+         "file" : "lib/Games/Lacuna/Task/Action/StarCacheBuild.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::StarCacheExport" : {
+         "file" : "lib/Games/Lacuna/Task/Action/StarCacheExport.pm",
          "version" : 0
       },
       "Games::Lacuna::Task::Action::StationPlanBuilder" : {
@@ -295,6 +304,10 @@
          "file" : "lib/Games/Lacuna/Task/Types.pm",
          "version" : 0
       },
+      "Games::Lacuna::Task::Upgrade" : {
+         "file" : "lib/Games/Lacuna/Task/Upgrade.pm",
+         "version" : "2.01"
+      },
       "Games::Lacuna::Task::Utils" : {
          "file" : "lib/Games/Lacuna/Task/Utils.pm",
          "version" : 0
@@ -316,5 +329,5 @@
          "url" : "git://github.com/maros/Games-Lacuna-Task.git"
       }
    },
-   "version" : "2.00"
+   "version" : "2.01"
 }

@@ -76,10 +76,6 @@ sub process_planet {
             foreach my $body (@{$star_data->{bodies}}) {
                 my $body_id = $body->{id};
                 
-                # Only excavate habitable planets and gas giants
-                next BODIES
-                    unless $body->{type} eq 'habitable planet' || $body->{type} eq 'gas giant';
-                
                 # Do not excavate body that has been excavated in past 30 days
                 next BODIES
                     if defined $body->{last_excavated}
@@ -131,7 +127,7 @@ sub process_planet {
         },
         x           => $planet_stats->{x},
         y           => $planet_stats->{y},
-        probed      => 1,
+        is_known    => 1,
         distance    => 1,
         min_distance=> $self->min_distance,
     );
