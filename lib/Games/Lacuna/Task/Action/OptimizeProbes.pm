@@ -8,8 +8,16 @@ with qw(Games::Lacuna::Task::Role::PlanetRun
     Games::Lacuna::Task::Role::Stars);
 
 sub description {
-    return q[Checks for duplicate probes];
+    return q[Check for duplicate probes];
 }
+
+has 'optimize_alliance' => (
+    is              => 'rw',
+    isa             => 'Bool',
+    default         => 0,
+    documentation   => 'Remove probes from solar systems with ally presence [Default: false]'
+);
+
 
 has '_probe_cache' => (
     is              => 'rw',
@@ -49,7 +57,30 @@ sub process_planet {
         $self->set_star_cache($star_data);
         
         my $star_id = $star_data->{id};
-        if ($self->has_probe_cache($star_id)) {
+        my $abandon = $self->has_probe_cache($star_id);
+        
+        if (! $abandon && $self->optimize_alliance) {
+            my $has_ally = 0;
+            my $has_self = 0;
+            foreach my $body (@{$star_data->{bodies}}) {
+                if (defined $body->{empire}) {
+                    given ($body->{empire}{alignment}) {
+                        when ('self') {
+                            $has_self++;
+                        }
+                        when ('ally') {
+                            $has_ally++;
+                        }
+                    }
+                }
+            }
+            
+            if ($has_ally  && !$has_self) {
+                $abandon = 1;
+            }
+        }
+        
+        if ($abandon) {
             $self->log('notice',"Abandoning probe from %s in %s",$planet_stats->{name},$star_data->{name});
             $self->request(
                 object  => $observatory_object,
@@ -57,7 +88,7 @@ sub process_planet {
                 params  => [$star_id],
             );
             
-            # Check star status
+            # Check star status again
             $self->_get_star_api($star_data->{id},$star_data->{x},$star_data->{y});
         } else {
             $self->add_probe_cache($star_id,1);

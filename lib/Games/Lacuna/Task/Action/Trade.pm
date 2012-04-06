@@ -13,7 +13,7 @@ has 'trades' => (
     is              => 'rw',
     isa             => 'HashRef',
     required        => 1,
-    documentation   => 'Automatic trades per planet',
+    documentation   => 'Automatic trades per planet [Required in config]',
 );
 
 =pod
@@ -82,7 +82,7 @@ trade:
 =cut
 
 sub description {
-    return q[This task automates the setup of trades via Trade Ministry];
+    return q[Add recurring trades to Trade Ministry];
 }
 
 sub process_planet {
@@ -176,7 +176,7 @@ sub process_planet {
             
             given ($offer->{class}) {
                 when('ship') {
-                    my @avaliable_ships = $self->ships(
+                    my @avaliable_ships = $self->get_ships(
                         planet          => $planet_stats,
                         quantity        => $offer->{quantity},
                         type            => $offer->{type},

@@ -10,7 +10,7 @@ has 'database' => (
     isa             => 'Path::Class::File',
     required        => 1,
     coerce          => 1,
-    documentation   => q[Exported database file],
+    documentation   => 'Exported database file [Required]',
 );
 
 sub description {
@@ -24,7 +24,7 @@ sub run {
     
     $self->log('notice','Start exporting star cache to %s',$export_file);
     
-    $self->client->storage->sqlite_backup_to_file( $export_file );
+    $self->client->storage->dbh->sqlite_backup_to_file( $export_file );
     
     my $export_dbh = DBI->connect("dbi:SQLite:dbname=$export_file","","",{ RaiseError => 1 });
     
@@ -32,7 +32,7 @@ sub run {
     $export_dbh->do('DELETE FROM cache');
     
     # Empty excavator cache
-    $export_dbh->do('UPDATE body SET last_excavated = NULL WHERE last_excavated IS NOT NULL');
+    $export_dbh->do('UPDATE body SET is_excavated = NULL WHERE is_excavated IS NOT NULL');
     
     $export_dbh->close();
     

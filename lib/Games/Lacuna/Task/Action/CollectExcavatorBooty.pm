@@ -45,6 +45,18 @@ has 'plans' => (
             'Ravine',
             'Rocky Outcropping',
             'Volcano',
+            
+            'Citadel of Knope',
+            'Black Hole Generator',
+            'Oracle of Anid',
+            'Temple of the Drajilites',
+            'Library of Jith',
+            'Kalavian Ruins',
+            'Interdimensional Rift',
+            'Gratch\'s Gauntlet',
+            'Crashed Ship Site',
+            'Pantheon of Hagness',
+            
         ]
     }
 );
@@ -53,7 +65,7 @@ has 'extra_build_level' => (
     is              => 'rw',
     isa             => 'Int',
     required        => 1,
-    documentation   => 'Ignore plans with extra build level above this value',
+    documentation   => 'Ignore plans with extra build level above this value [Default: 2]',
     default         => 2,
 );
 
@@ -61,13 +73,13 @@ has 'min_items' => (
     is              => 'rw',
     isa             => 'Int',
     required        => 1,
-    documentation   => 'Only send ship if we have n-items to be sent',
-    default         => 0,
+    documentation   => 'Only send ship if we have n-items to be sent [Default: 1]',
+    default         => 1,
 );
 
 
 sub description {
-    return q[This task ships excavator booty to a selected planet];
+    return q[Ship excavator booty to a selected planet];
 }
 
 sub process_planet {

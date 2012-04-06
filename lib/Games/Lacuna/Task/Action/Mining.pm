@@ -12,7 +12,7 @@ use List::Util qw(sum);
 use Games::Lacuna::Client::Types qw(ore_types);
 
 sub description {
-    return q[This task automates the deployment of mining platforms on asteroids];
+    return q[Deploy mining platforms to best available asteroids];
 }
 
 sub process_planet {
@@ -43,7 +43,7 @@ sub process_planet {
     my $spaceport_object = $self->build_object($spaceport);
     
     # Get available mining ships
-    my @avaliable_miningships = $self->ships(
+    my @avaliable_miningships = $self->get_ships(
         planet          => $planet_stats,
         quantity        => $available_platforms,
         type            => 'mining_platform_ship',

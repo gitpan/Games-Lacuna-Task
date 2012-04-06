@@ -7,8 +7,6 @@ extends qw(Games::Lacuna::Task::Action);
 with qw(Games::Lacuna::Task::Role::PlanetRun
     Games::Lacuna::Task::Role::Storage);
 
-use Games::Lacuna::Client::Types qw(ore_types food_types);
-
 sub description {
     return q[Automatically accept missions];
 }
@@ -17,7 +15,7 @@ has 'missions' => (
     is              => 'rw',
     isa             => 'ArrayRef[Str]',
     required        => 1,
-    documentation   => 'Automatic missions',
+    documentation   => 'Automatic missions [Required, Multiple]',
 );
 
 sub process_planet {
@@ -96,39 +94,33 @@ sub process_planet {
         
         $self->log('notice',"Completing mission %s on %s",$mission->{name},$planet_stats->{name});
         
-        try {
-            my $response = $self->request(
-                object  => $missioncommand_object,
-                method  => 'complete_mission',
-                params  => [$mission->{id}],
-            );
-            $planet_stats = $response->{status}{body};
-            
-            my $body = sprintf("We have completed the mission *%s* on {Planet %i %s}\nObjective: %s\nReward:%s",
-                $mission->{name},
-                $planet_stats->{id},
-                $planet_stats->{name},
-                join (", ",@{$mission->{objectives}}),
-                join (", ",@{$mission->{rewards}}),
-            );
-            
-            $self->send_message('Mission completed',$body);
-            return 1;
-        } catch {
-            my $error = $_;
-            if (defined $error) {
-                if (blessed($error)
-                    && $error->isa('LacunaRPCException')) {
-                    if ($error->code == 1013) {
+        my $response = $self->request(
+            object      => $missioncommand_object,
+            method      => 'complete_mission',
+            params      => [$mission->{id}],
+            catch       => [
+                [
+                    1013,
+                    sub {
+                        my ($error) = @_;
                         $self->log('debug',"Could not complete mission %s: %s",$mission->{name},$error->message);
-                    } else {
-                        $error->rethrow();
-                    }    
-                } else {
-                    $self->abort($error);
-                }
-            }
-        };
+                        next MISSION;
+                    }
+                ]
+            ],
+            
+        );
+        $planet_stats = $response->{status}{body};
+            
+        my $body = sprintf("We have completed the mission *%s* on {Planet %i %s}\nObjective: %s\nReward:%s",
+            $mission->{name},
+            $planet_stats->{id},
+            $planet_stats->{name},
+            join (", ",@{$mission->{objectives}}),
+            join (", ",@{$mission->{rewards}}),
+        );
+            
+        $self->send_message('Mission completed',$body);
     }
 }
 

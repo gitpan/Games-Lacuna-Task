@@ -15,7 +15,7 @@ use Text::CSV;
 after 'BUILD' => sub {
     my ($self) = @_;
     
-    my ($star_count) = $self->client->storage->selectrow_array('SELECT COUNT(1) FROM star');
+    my ($star_count) = $self->client->storage_selectrow_array('SELECT COUNT(1) FROM star');
     
     if ($star_count == 0) {
         $self->fetch_all_stars(0);
@@ -47,7 +47,7 @@ sub fetch_all_stars {
     
     # Parse star map
     $self->log('debug',"Parsing new star map");
-    my $csv = Text::CSV->new ();
+    my $csv = Text::CSV->new();
     open my $fh, "<:encoding(utf8)", \$content;
     $csv->column_names( $csv->getline($fh) );
     
@@ -108,7 +108,7 @@ sub _get_body_cache_for_star {
             body.water,
             body.ore,
             body.empire,
-            body.last_excavated,
+            body.is_excavated,
             empire.id AS empire_id,
             empire.name AS empire_name,
             empire.alignment AS empire_alignment,
@@ -135,7 +135,7 @@ sub _get_star_cache {
         unless defined $query;
     
     # Get star from cache
-    my $star_cache = $self->client->storage->selectrow_hashref('SELECT 
+    my $star_cache = $self->client->storage_selectrow_hashref('SELECT 
             star.id,
             star.x,
             star.y,
@@ -146,7 +146,6 @@ sub _get_star_cache {
             star.is_known
         FROM star
         WHERE '.$query,
-        {},
         @params
     );
     
@@ -214,8 +213,8 @@ sub _inflate_body {
     }
     
     my $body_data = {
-        (map { $_ => $body->{$_} } qw(id x y orbit name type water size last_excavated)),
-        ore         => $Games::Lacuna::Task::Client::JSON->decode($body->{ore}), 
+        (map { $_ => $body->{$_} } qw(id x y orbit name type water size is_excavated)),
+        ore         => $Games::Lacuna::Task::Storage::JSON->decode($body->{ore}), 
         %{$star_data},
     };
     
@@ -237,18 +236,18 @@ sub _get_body_cache {
     return
         unless defined $query;
     
-    my $body = $self->client->storage->fetchrow_array('SELECT 
+    my $body = $self->client->storage_selectrow_hashref('SELECT 
             body.id, 
             body.star,
             body.x,
             body.y,
             body.orbit,
-            body.size
+            body.size,
             body.name,
             body.type,
-            body.water
-            body.ore
-            body.empire
+            body.water,
+            body.ore,
+            body.empire,
             body.last_excavated,
             star.id AS star_id,
             star.name AS star_name,
@@ -264,7 +263,6 @@ sub _get_body_cache {
         INNER JOIN star ON (star.id = body.star)
         LEFT JOIN empire ON (empire.id = body.empire)
         WHERE '.$query,
-        {},
         @params
     );
     
@@ -352,7 +350,7 @@ sub _get_star_api {
     
     # Fetch x and y unless given
     unless (defined $x && defined $y) {
-        ($x,$y) = $self->client->storage->selectrow_array('SELECT x,y FROM star WHERE id = ?',{},$star_id);
+        ($x,$y) = $self->client->storage_selectrow_array('SELECT x,y FROM star WHERE id = ?',$star_id);
     }
     
     return
@@ -472,7 +470,7 @@ sub set_star_cache {
         if $star_data->{is_probed};
     
     unless (defined $star_data->{is_known}) {
-        ($star_data->{is_known}) = $self->client->storage->selectrow_array('SELECT COUNT(1) FROM body WHERE star = ?',{},$star_id);
+        ($star_data->{is_known}) = $self->client->storage_selectrow_array('SELECT COUNT(1) FROM body WHERE star = ?',$star_id);
     }
     
     # Update star cache
@@ -488,12 +486,20 @@ sub set_star_cache {
     return
         unless defined $star_data->{bodies};
     
+    $self->_set_star_cache_bodies($star_data);
+}
+
+sub _set_star_cache_bodies {
+    my ($self,$star_data) = @_;
+    
+    my $star_id = $star_data->{id};
+    
     # Get excavate status
-    my %last_excavated;
-    my $sth_excavate = $self->storage_prepare('SELECT id,last_excavated FROM body WHERE star = ? AND last_excavated IS NOT NULL');
+    my %is_excavated;
+    my $sth_excavate = $self->storage_prepare('SELECT id,is_excavated FROM body WHERE star = ? AND is_excavated IS NOT NULL');
     $sth_excavate->execute($star_id);
-    while (my ($body_id,$last_excavated) = $sth_excavate->fetchrow_array) {
-        $last_excavated{$body_id} = $last_excavated;
+    while (my ($body_id,$is_excavated) = $sth_excavate->fetchrow_array) {
+        $is_excavated{$body_id} = $is_excavated;
     }
     
     # Remove all bodies
@@ -507,7 +513,7 @@ sub set_star_cache {
     
     # Insert new bodies
     my $sth_insert = $self->storage_prepare('INSERT INTO body 
-        (id,star,x,y,orbit,size,name,normalized_name,type,water,ore,empire,last_excavated) 
+        (id,star,x,y,orbit,size,name,normalized_name,type,water,ore,empire,is_excavated) 
         VALUES
         (?,?,?,?,?,?,?,?,?,?,?,?,?)');
     
@@ -515,7 +521,11 @@ sub set_star_cache {
     foreach my $body_data (@{$star_data->{bodies}}) {
         my $empire = $body_data->{empire} || {};
         
-        $body_data->{last_excavated} = $last_excavated{$body_data->{id}};
+        $body_data->{is_excavated} = $is_excavated{$body_data->{id}};
+        
+        my $ore = $body_data->{ore};
+        $ore = $Games::Lacuna::Task::Storage::JSON->encode($ore)
+            if ref $ore eq 'HASH';
         
         $sth_insert->execute(
             $body_data->{id},
@@ -528,9 +538,9 @@ sub set_star_cache {
             normalize_name($body_data->{name}),
             $body_data->{type},
             $body_data->{water},
-            $Games::Lacuna::Task::Client::JSON->encode($body_data->{ore}),
+            $ore,
             $empire->{id},
-            $body_data->{last_excavated},
+            $body_data->{is_excavated},
         );
         
         if (defined $empire->{id}) {
@@ -574,6 +584,9 @@ sub search_stars_callback {
     if (defined $params{is_probed}) {
         push(@sql_where,'(star.last_checked < ? OR star.is_probed = ? OR star.is_probed IS NULL)');
         push(@sql_params,(time - $Games::Lacuna::Task::Constants::MAX_STAR_CACHE_AGE),$params{is_probed});
+    } elsif (exists $params{is_probed}) {
+        push(@sql_where,'(star.last_checked < ? OR star.is_probed IS NULL)');
+        push(@sql_params,(time - $Games::Lacuna::Task::Constants::MAX_STAR_CACHE_AGE));
     }
     # Only known/unknown 
     if (defined $params{is_known}) {
@@ -648,10 +661,10 @@ sub search_stars_callback {
 }
 
 sub set_body_excavated {
-    my ($self,$body_id,$timestamp) = @_;
+    my ($self,$body_id,$is_excavated) = @_;
     
-    $timestamp ||= time();
-    $self->storage_do('UPDATE body SET last_excavated = ? WHERE id = ?',$timestamp,$body_id);
+    $is_excavated //= 1;
+    $self->storage_do('UPDATE body SET is_excavated = ? WHERE id = ?',$is_excavated,$body_id);
 }
 
 no Moose::Role;
@@ -722,7 +735,7 @@ Fetches body data from the local cache for the given body coordinates
 
 =head2 set_body_excavated
 
- $self->set_body_excavated($body_id,$timestamp);
+ $self->set_body_excavated($body_id,$is_excavated);
 
 Mark body as excavated
 

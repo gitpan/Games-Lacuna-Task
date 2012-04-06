@@ -9,7 +9,7 @@ with qw(Games::Lacuna::Task::Role::Stars);
 use List::Util qw(max min);
 
 sub description {
-    return q[This task builds a star cache and can help to reduce the number of api calls made by various tasks];
+    return q[Build a star cache, reducing subsequent api calls made by various tasks];
 }
 
 has 'coordinate' => (

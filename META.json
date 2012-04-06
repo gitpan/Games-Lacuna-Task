@@ -4,7 +4,7 @@
       "Maroš Kollár <maros@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112621",
+   "generated_by" : "Module::Build version 0.4, CPAN::Meta::Converter version 2.120630",
    "license" : [
       "perl_5"
    ],
@@ -16,7 +16,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::More" : 0
+            "Test::More" : "0"
          }
       },
       "configure" : {
@@ -26,27 +26,28 @@
       },
       "runtime" : {
          "requires" : {
-            "DBD::SQLite" : 0,
-            "DBI" : 0,
-            "Digest::MD5" : 0,
-            "Email::Stuff" : 0,
-            "Games::Lacuna::Client" : 0,
-            "IO::Interactive" : 0,
+            "Class::Load" : "0",
+            "DBD::SQLite" : "0",
+            "DBI" : "0",
+            "Digest::MD5" : "0",
+            "Email::Stuff" : "0",
+            "Games::Lacuna::Client" : "0",
+            "IO::Interactive" : "0",
             "JSON" : "2.00",
-            "LWP" : 0,
-            "Module::Pluggable" : 0,
+            "LWP" : "0",
+            "Module::Pluggable" : "0",
             "Moose" : "2.0000",
-            "MooseX::Getopt" : 0,
-            "MooseX::Role::Parameterized" : 0,
-            "MooseX::Types::Path::Class" : 0,
-            "Path::Class" : 0,
-            "Term::ANSIColor" : 0,
-            "Term::ReadKey" : 0,
-            "Text::CSV" : 0,
-            "Text::Table" : 0,
-            "Try::Tiny" : 0,
-            "Unicode::Normalize" : 0,
-            "YAML::Any" : 0,
+            "MooseX::Getopt" : "0",
+            "MooseX::Role::Parameterized" : "0",
+            "MooseX::Types::Path::Class" : "0",
+            "Path::Class" : "0",
+            "Term::ANSIColor" : "0",
+            "Term::ReadKey" : "0",
+            "Text::CSV" : "0",
+            "Text::Table" : "0",
+            "Try::Tiny" : "0",
+            "Unicode::Normalize" : "0",
+            "YAML::Any" : "0",
             "perl" : "v5.10.1"
          }
       }
@@ -54,7 +55,7 @@
    "provides" : {
       "Games::Lacuna::Task" : {
          "file" : "lib/Games/Lacuna/Task.pm",
-         "version" : "2.01"
+         "version" : "2.03"
       },
       "Games::Lacuna::Task::Action" : {
          "file" : "lib/Games/Lacuna/Task/Action.pm",
@@ -86,6 +87,10 @@
       },
       "Games::Lacuna::Task::Action::Defence" : {
          "file" : "lib/Games/Lacuna/Task/Action/Defence.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::EmpireCache" : {
+         "file" : "lib/Games/Lacuna/Task/Action/EmpireCache.pm",
          "version" : 0
       },
       "Games::Lacuna::Task::Action::EmpireFind" : {
@@ -120,6 +125,10 @@
          "file" : "lib/Games/Lacuna/Task/Action/OptimizeProbes.pm",
          "version" : 0
       },
+      "Games::Lacuna::Task::Action::Push" : {
+         "file" : "lib/Games/Lacuna/Task/Action/Push.pm",
+         "version" : 0
+      },
       "Games::Lacuna::Task::Action::Repair" : {
          "file" : "lib/Games/Lacuna/Task/Action/Repair.pm",
          "version" : 0
@@ -136,8 +145,24 @@
          "file" : "lib/Games/Lacuna/Task/Action/ShipDispatch.pm",
          "version" : 0
       },
+      "Games::Lacuna::Task::Action::ShipUpdate" : {
+         "file" : "lib/Games/Lacuna/Task/Action/ShipUpdate.pm",
+         "version" : 0
+      },
       "Games::Lacuna::Task::Action::Spy" : {
          "file" : "lib/Games/Lacuna/Task/Action/Spy.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::SpyFetch" : {
+         "file" : "lib/Games/Lacuna/Task/Action/SpyFetch.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::SpySend" : {
+         "file" : "lib/Games/Lacuna/Task/Action/SpySend.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::SpyTraining" : {
+         "file" : "lib/Games/Lacuna/Task/Action/SpyTraining.pm",
          "version" : 0
       },
       "Games::Lacuna::Task::Action::StarCacheBuild" : {
@@ -146,6 +171,14 @@
       },
       "Games::Lacuna::Task::Action::StarCacheExport" : {
          "file" : "lib/Games/Lacuna/Task/Action/StarCacheExport.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::StarCacheReport" : {
+         "file" : "lib/Games/Lacuna/Task/Action/StarCacheReport.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::StarCacheUnknown" : {
+         "file" : "lib/Games/Lacuna/Task/Action/StarCacheUnknown.pm",
          "version" : 0
       },
       "Games::Lacuna::Task::Action::StationPlanBuilder" : {
@@ -172,6 +205,14 @@
          "file" : "lib/Games/Lacuna/Task/Action/Vrbansk.pm",
          "version" : 0
       },
+      "Games::Lacuna::Task::Action::VrbanskBuild" : {
+         "file" : "lib/Games/Lacuna/Task/Action/VrbanskBuild.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Action::VrbanskCombine" : {
+         "file" : "lib/Games/Lacuna/Task/Action/VrbanskCombine.pm",
+         "version" : 0
+      },
       "Games::Lacuna::Task::Action::WasteDispose" : {
          "file" : "lib/Games/Lacuna/Task/Action/WasteDispose.pm",
          "version" : 0
@@ -192,16 +233,16 @@
          "file" : "lib/Games/Lacuna/Task/ActionProto.pm",
          "version" : 0
       },
-      "Games::Lacuna::Task::Base" : {
-         "file" : "lib/Games/Lacuna/Task/Base.pm",
-         "version" : 0
-      },
       "Games::Lacuna::Task::Client" : {
          "file" : "lib/Games/Lacuna/Task/Client.pm",
          "version" : 0
       },
       "Games::Lacuna::Task::Constants" : {
          "file" : "lib/Games/Lacuna/Task/Constants.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Meta::Class::Trait::Deprecated" : {
+         "file" : "lib/Games/Lacuna/Task/Meta/Class/Trait/Deprecated.pm",
          "version" : 0
       },
       "Games::Lacuna::Task::Meta::Class::Trait::NoAutomatic" : {
@@ -234,6 +275,10 @@
       },
       "Games::Lacuna::Task::Report::Mining" : {
          "file" : "lib/Games/Lacuna/Task/Report/Mining.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::Task::Role::Actions" : {
+         "file" : "lib/Games/Lacuna/Task/Role/Actions.pm",
          "version" : 0
       },
       "Games::Lacuna::Task::Role::Building" : {
@@ -296,6 +341,10 @@
          "file" : "lib/Games/Lacuna/Task/Setup.pm",
          "version" : 0
       },
+      "Games::Lacuna::Task::Storage" : {
+         "file" : "lib/Games/Lacuna/Task/Storage.pm",
+         "version" : 0
+      },
       "Games::Lacuna::Task::Table" : {
          "file" : "lib/Games/Lacuna/Task/Table.pm",
          "version" : 0
@@ -304,12 +353,16 @@
          "file" : "lib/Games/Lacuna/Task/Types.pm",
          "version" : 0
       },
-      "Games::Lacuna::Task::Upgrade" : {
-         "file" : "lib/Games/Lacuna/Task/Upgrade.pm",
-         "version" : "2.01"
-      },
       "Games::Lacuna::Task::Utils" : {
          "file" : "lib/Games/Lacuna/Task/Utils.pm",
+         "version" : 0
+      },
+      "Games::Lacuna::TaskRunner" : {
+         "file" : "lib/Games/Lacuna/Task/TaskRunner.pm",
+         "version" : 0
+      },
+      "Moose::Meta::Class::Custom::Trait::Deprecated" : {
+         "file" : "lib/Games/Lacuna/Task/Meta/Class/Trait/Deprecated.pm",
          "version" : 0
       },
       "Moose::Meta::Class::Custom::Trait::NoAutomatic" : {
@@ -329,5 +382,5 @@
          "url" : "git://github.com/maros/Games-Lacuna-Task.git"
       }
    },
-   "version" : "2.01"
+   "version" : "2.03"
 }

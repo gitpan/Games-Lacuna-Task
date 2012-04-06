@@ -63,13 +63,16 @@ has 'upgrade_buildings' => (
             'Sand'                  => ['extra'],
             'Grove'                 => ['extra'],
             'Lagoon'                => ['extra'],
+            (map {
+                 'LCOT'.$_          => ['global'],
+            } qw(A..I)),
         }
     },
     documentation => 'Building uprade preferences',
 );
 
 sub description {
-    return q[This task automates advanced upgrading of buildings if the build queue is empty];
+    return q[Upgrade buildings if the build queue is empty];
 }
 
 sub process_planet {
