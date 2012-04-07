@@ -1,6 +1,8 @@
 package Games::Lacuna::Task::Role::Ships;
 
 use 5.010;
+our $VERSION = $Games::Lacuna::Task::VERSION;
+
 use Moose::Role;
 
 use List::Util qw(min sum max first);
@@ -421,6 +423,7 @@ no Moose::Role;
 1;
 
 =encoding utf8
+
 =head1 NAME
 
 Games::Lacuna::Task::Role::Ships - Helper methods for fetching and building ships

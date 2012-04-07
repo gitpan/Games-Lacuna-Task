@@ -1,6 +1,8 @@
 package Games::Lacuna::Task::Role::Stars;
 
 use 5.010;
+our $VERSION = $Games::Lacuna::Task::VERSION;
+
 use Moose::Role;
 
 use List::Util qw(max min);
@@ -772,7 +774,7 @@ Valid search options are
 
 =item * distance (1 = ascending, 0 = descending)
 
-=iten * zone
+=item * zone
 
 =item * x,y (refernce coordinates for distance calculations)
 

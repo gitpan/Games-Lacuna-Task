@@ -1,6 +1,7 @@
 package Games::Lacuna::Task::ActionProto;
 
 use 5.010;
+our $VERSION = $Games::Lacuna::Task::VERSION;
 
 use Moose;
 extends qw(Games::Lacuna::Task);
@@ -84,6 +85,8 @@ sub run {
             }
         }
     }
+    
+    return;
 }
 
 
@@ -150,6 +153,8 @@ short description:
 options:
 $options
 USAGE_ACTION
+
+    return;
 }
 
 sub global_usage {
@@ -185,6 +190,8 @@ $global_options
 available commands:
 $available_commands
 USAGE
+
+    return;
 }
 
 sub _format_list {

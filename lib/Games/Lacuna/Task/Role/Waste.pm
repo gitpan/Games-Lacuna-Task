@@ -1,6 +1,8 @@
 package Games::Lacuna::Task::Role::Waste;
 
 use 5.010;
+our $VERSION = $Games::Lacuna::Task::VERSION;
+
 use Moose::Role;
 
 use List::Util qw(max sum min);
@@ -107,7 +109,7 @@ Games::Lacuna::Task::Role::Waste - Waste helper methods
 
 This role provides helper method to work with waste diposal
 
-=head METHODS
+=head1 METHODS
 
 =head2 disposeable_waste
 

@@ -16,7 +16,7 @@ name: Games-Lacuna-Task
 provides:
   Games::Lacuna::Task:
     file: lib/Games/Lacuna/Task.pm
-    version: 2.03
+    version: 2.04
   Games::Lacuna::Task::Action:
     file: lib/Games/Lacuna/Task/Action.pm
     version: 0
@@ -257,7 +257,7 @@ requires:
   DBI: 0
   Digest::MD5: 0
   Email::Stuff: 0
-  Games::Lacuna::Client: 0
+  Games::Lacuna::Client: 0.003
   IO::Interactive: 0
   JSON: 2.00
   LWP: 0
@@ -279,4 +279,4 @@ resources:
   bugtracker: https://github.com/maros/Games-Lacuna-Task/issues
   license: http://dev.perl.org/licenses/
   repository: git://github.com/maros/Games-Lacuna-Task.git
-version: 2.03
+version: 2.04

@@ -3,11 +3,8 @@ package Games::Lacuna::Task;
 # ============================================================================
 
 use 5.010;
-
 our $AUTHORITY = 'cpan:MAROS';
-our $VERSION = "2.03";
-
-use 5.010;
+our $VERSION = "2.04";
 
 use Moose;
 
@@ -62,6 +59,8 @@ sub BUILD {
     my $lockfh = $lockfile->openw();
     print $lockfh $$;
     $lockfh->close;
+    
+    return $self;
 }
 
 sub DEMOLISH {
@@ -69,6 +68,7 @@ sub DEMOLISH {
     
     $self->lockfile->remove
         if -e $self->lockfile;
+    return;
 }
 
 
@@ -119,11 +119,14 @@ the Lacuna Expanse MMPOG. It provides
 
 =back
 
-=head CONFIGURATION
+=head1 CONFIGURATION
 
 Games::Lacuna::Task uses a yaml configuration file which is loaded from the
 database directory (defaults to ~/.lacuna). The filename should be config.yml
 or lacuna.yml.
+
+If you run C<lacuna_task> for the first time the programm will guide you 
+through the setup process and create a basic config file.
 
 Example config.yml
 
