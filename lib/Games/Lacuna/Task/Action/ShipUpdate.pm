@@ -96,70 +96,100 @@ sub process_planet {
     my $old_ships = {};
     my $threshold = $self->threshold / 100 + 1;
     
+    # Loop all shios
+    SHIPS:
     foreach my $ship (@{$ships_data->{ships}}) {
         my $ship_type = $ship->{type};
         $ship_type =~ s/\d$//;
         
+        # Filter ships by name, type and task
         next
-            if $ship->{name} =~ m/\bScuttle\b/i;
+            if $ship->{name} =~ m/\b scuttle \b/ix;
+        next
+            if $ship->{task} ~~ [qw(Waiting On Trade Building)];
         next
             unless $ship_type ~~ $self->handle_ships;
         next
             unless defined $self->best_ships->{$ship_type};
         
-        my $best_ship = $self->get_best_ships($ship_type);
+        my $best_ship = $self->get_best_ship($ship_type);
         
         my $ship_is_ok = 1;
         
         foreach my $attribute (@ATTRIBUTES) {
-            if ($best_ship->{$attribute} / $threshold > $ship->{$attribute}) {
-                $self->log('debug','Ship %s on %s is outdated (%s %i vs. %i)',$ship->{name},$planet_stats->{name},$attribute,$ship->{$attribute},$best_ship->{$attribute});
+            if ($ship->{$attribute} > $best_ship->{$attribute}) {
+                next SHIPS;
+            }
+            if ($ship->{$attribute} < ($best_ship->{$attribute} / $threshold)) {
                 $ship_is_ok = 0;
-                last;
             }
         }
         
         next
             if $ship_is_ok;
         
-        $old_ships->{$ship_type} ||= [];
+        $self->log('debug','Ship %s on %s is outdated',$ship->{name},$planet_stats->{name});
         
+        $old_ships->{$ship_type} ||= [];
         push (@{$old_ships->{$ship_type}},$ship);
     }
     
     foreach my $ship_type (sort { scalar @{$old_ships->{$b}} <=> scalar @{$old_ships->{$a}} } keys %{$old_ships}) {
         my $old_ships = $old_ships->{$ship_type};
-        my $best_ships = $self->get_best_ships($ship_type);
+        my $best_ships = $self->get_best_ship($ship_type);
         my $build_planet_id = $best_ships->{planet};
         my $build_planet_stats = $self->get_best_planet($build_planet_id);
         next
             if ! defined $build_planet_stats 
             ||$build_planet_stats->{total_slots} <= 0;
+            
+        my $build_spaceport = $self->find_building($build_planet_id,'SpacePort');
+        my $build_spaceport_object = $self->build_object($build_spaceport);
         
-        my $new_building = $self->build_ships(
+        my (@ships_mining,@ships_general);
+        foreach my $old_ship (@{$old_ships}) {
+            if ($old_ship->{task} eq 'Mining') {
+                push(@ships_mining,$old_ship);    
+            } else {
+                push(@ships_general,$old_ship); 
+            }
+        }
+        
+        my $name_prefix = ($build_planet_id == $planet_stats->{id} ) ? '' : $planet_stats->{name};
+        
+        my @new_building = $self->build_ships(
             planet              => $self->my_body_status($build_planet_id),
             quantity            => scalar(@{$old_ships}),
             type                => $best_ships->{type},
             spaceports_slots    => $build_planet_stats->{spaceport_slots},
             shipyard_slots      => $build_planet_stats->{shipyard_slots},
             shipyards           => $build_planet_stats->{shipyards},
-            ($build_planet_id != $planet_stats->{id} ? (name_prefix => $planet_stats->{name}) : () ),
+            name_prefix         => $name_prefix,
         );
         
-        $build_planet_stats->{spaceport_slots} -= $new_building;
-        $build_planet_stats->{shipyard_slots} -= $new_building;
-        $build_planet_stats->{total_slots} -= $new_building;
+        my $new_building_count = scalar @new_building;
+        $build_planet_stats->{spaceport_slots} -= $new_building_count;
+        $build_planet_stats->{shipyard_slots} -= $new_building_count;
+        $build_planet_stats->{total_slots} -= $new_building_count;
         
-        for (1..$new_building) {
-            my $old_ship = pop(@{$old_ships});
+        foreach my $new_ship (@new_building) {
+            my $old_ship;
+            if ($old_ship = pop(@ships_mining)) {
+                $self->name_ship(
+                    spaceport   => $build_spaceport_object,
+                    ship        => $new_ship,
+                    prefix      => [ $planet_stats->{name},'Mining' ],
+                    name        => $new_ship->{type_human},
+                );
+            } else {
+                $old_ship = pop(@ships_general)   
+            }
             
-            next
-                if $old_ship->{name} =~ /\bScuttle\b/i;
-            
-            $self->request(
-                object  => $spaceport_object,
-                method  => 'name_ship',
-                params  => [$old_ship->{id},$old_ship->{name}.' Scuttle!'],
+            $self->name_ship(
+                spaceport   => $spaceport_object,
+                ship        => $old_ship,
+                prefix      => 'Scuttle',
+                ignore      => 1,
             );
         }
         
@@ -170,17 +200,15 @@ sub process_planet {
 sub _build_best_ships {
     my ($self) = @_;
     
-    $self->log('info',"Get best build planet for each ship type");
-    
     my $best_ships = {};
     foreach my $planet_stats ($self->get_planets) {
+        $self->log('info',"Checking best ships at planet %s",$planet_stats->{name});
         my ($buildable_ships,$docks_available) = $self->get_buildable_ships($planet_stats);
         
         BUILDABLE_SHIPS:
         while (my ($type,$data) = each %{$buildable_ships}) {
             $data->{planet} = $planet_stats->{id};
             $best_ships->{$type} ||= $data;
-            warn $data;
             foreach my $attribute (@ATTRIBUTES) {
                 if ($best_ships->{$type}{$attribute} < $data->{$attribute}) {
                     
@@ -196,8 +224,6 @@ sub _build_best_ships {
 
 sub _build_best_planets {
     my ($self) = @_;
-    
-    $self->log('info',"Get info about best build planets");
     
     my $best_planets = {};
     foreach my $best_ship ($self->best_ship_types) {
@@ -218,6 +244,8 @@ sub _build_best_planets {
                 shipyards       => $available_shipyards,
             };
         }
+        
+        $self->log('info',"Best %s can be buildt at %s",$best_ship,$self->my_body_status($planet_id)->{name});
     }
     
     return $best_planets;
